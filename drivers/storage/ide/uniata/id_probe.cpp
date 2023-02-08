@@ -31,7 +31,7 @@ Notes:
 Revision History:
 
     Some parts of hardware-specific code were taken from FreeBSD 4.3-6.1 ATA driver by
-         Søren Schmidt, Copyright (c) 1998-2007
+         Sï¿½ren Schmidt, Copyright (c) 1998-2007
 
     Some parts of device detection code were taken from from standard ATAPI.SYS from NT4 DDK by
          Mike Glass (MGlass)
@@ -1942,6 +1942,7 @@ UniataClaimLegacyPCIIDE(
 {
     NTSTATUS status;
     PCM_RESOURCE_LIST resourceList = NULL;
+    PCM_RESOURCE_LIST oldResList   = NULL;
     UNICODE_STRING devname;
 
     KdPrint2((PRINT_PREFIX "UniataClaimLegacyPCIIDE:\n"));
@@ -1972,6 +1973,8 @@ del_do:
         BMList[i].PciIdeDevObj          = NULL;
         return status;
     }
+
+    oldResList = resourceList;
 
     RtlZeroMemory(
         resourceList,
@@ -2006,6 +2009,9 @@ del_do:
         goto del_do;
     }
 
+    ExFreePool(oldResList);
+    ExFreePool(resourceList);
+    
     KdPrint2((PRINT_PREFIX "ok %#x\n", status));
     BMList[i].ChanInitOk |= 0x80;
 
